@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-22.04
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.ALPS }}
     permissions:
       contents: write
     steps:
@@ -120,8 +120,8 @@ jobs:
       run: |
         mkdir workspace
         cd workspace
-        git config --global user.name "Samuel Kendall"
-        git config --global user.email "kinguser981@gmail.com"
+        git config --global user.name "Tec4Sho"
+        git config --global user.email "tec4sho@gmail.com"
         repo init --depth=1 -u ${{ steps.manifest.outputs.value }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
   
     - name: Repo Sync
@@ -132,6 +132,7 @@ jobs:
     - name: Clone Device Tree
       run: |
         cd workspace
+        mkdir -p ${{ github.event.inputs.DEVICE_PATH }}/
         git clone ${{ github.event.inputs.DEVICE_TREE }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
         cd ${{ github.event.inputs.DEVICE_PATH }}
         echo "COMMIT_ID=$(git rev-parse HEAD)" >> $GITHUB_ENV
