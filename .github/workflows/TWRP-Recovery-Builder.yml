@@ -55,13 +55,13 @@ on:
       SPACE_SAVER:
         description: 'Cleans homebrew, docker, npm, apt & os swap'
         type: string #boolean
-        required: true
+        required: false
         default: False
         
 jobs:
   build:
     name: Build TWRP by ${{ github.actor }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     if: github.event.repository.owner.id == github.event.sender.id
     env:
       GITHUB_TOKEN: ${{ secrets.ALPS }}
@@ -90,6 +90,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Optimize Disk Space
+      if: github.event.inputs.SPACE_SAVER == True
       uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
       with:
           operate_sudo: "${{ github.event.inputs.SPACE_SAVER }}"
@@ -105,8 +106,6 @@ jobs:
           npm_clean: "${{ github.event.inputs.SPACE_SAVER }}"
           os_swap: "${{ github.event.inputs.SPACE_SAVER }}" 
            
-    - uses: actions/checkout@v3  
-
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
       
