@@ -111,6 +111,9 @@ jobs:
         echo "OS SWAP: ${{ inputs.OS_SWAP }}"
         echo "::endgroup::"
 
+    - name: Disk Space Check-Before 
+      run: df . -h      
+
     - name: Optimize Disk Space
       uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
       with:
@@ -126,8 +129,9 @@ jobs:
           npm_prune: "${{ inputs.NPM_PRUNE }}"
           npm_clean: "${{ inputs.NPM_CLEAN }}"
           os_swap: "${{ inputs.OS_SWAP }}" 
+      continue-on-error: true
 
-    - name: Disk Space Check
+    - name: Disk Space Check-After
       run: |
         sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
         echo "#"
