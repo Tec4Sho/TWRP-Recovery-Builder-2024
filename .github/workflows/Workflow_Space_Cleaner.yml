@@ -1,5 +1,5 @@
 
-name: Workflow Space Cleaner 2025
+name: Workflow Space Cleaner - 2025
 
 on:
   workflow_dispatch:
