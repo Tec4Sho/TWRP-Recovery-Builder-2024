@@ -61,7 +61,7 @@ on:
 jobs:
   build:
     name: Build TWRP by ${{ github.actor }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event.repository.owner.id == github.event.sender.id
     env:
       GITHUB_TOKEN: ${{ secrets.ALPS }}
@@ -70,7 +70,7 @@ jobs:
     steps:
     - name: Delete huge unnecessary tools folder
       run: rm -rf /opt/hostedtoolcache
-           rm -rf /usr/share/dotnet
+           #rm -rf /usr/share/dotnet
            
     - name: Check Out
       uses: actions/checkout@v3
