@@ -46,12 +46,13 @@ on:
         description: 'Release Recovery.tar For Samsung devices'
         required: false
         default: false
-        type: boolean
+        type: string #boolean
       RECOVERY_INSTALLER:
         description: 'Include recovery installer.zip'
-        type: boolean
+        type: string #boolean
         required: true
         default: true
+        
 jobs:
   build:
     name: Build TWRP by ${{ github.actor }}
@@ -64,7 +65,7 @@ jobs:
     steps:
     - name: Check Out
       uses: actions/checkout@v3
-      
+
     - name: Display Inputs
       run: |
         echo "::group::User Environment Variables"
@@ -78,6 +79,28 @@ jobs:
         echo "Include Recovery Installer: ${{ github.event.inputs.RECOVERY_INSTALLER }}"
         echo "Release recovery.tar For Samsung devices: ${{ github.event.inputs.RECOVERY_TAR }}"
         echo "::endgroup::"
+
+    - name: Optimize Disk Space
+      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
+      with:
+          operate_sudo: "True"
+          general_include: ".+"
+          docker_include: ".+"
+          docker_prune: "True"
+          docker_clean: "True"
+          apt_prune: "True"
+          apt_clean: "True"
+          homebrew_prune: "True"
+          homebrew_clean: "True"
+          npm_prune: "True"
+          npm_clean: "True"
+          os_swap: "True"  
+
+    - name: Delete huge unnecessary tools folder
+      run: rm -rf /opt/hostedtoolcache
+           rm -rf /usr/share/dotnet
+           
+    - uses: actions/checkout@v3  
 
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
