@@ -1,112 +1,96 @@
-
-name: Workflow Space Cleaner - 2025
+name: Workflow Space Cleaner 2025
 
 on:
   workflow_dispatch:
     inputs:
       OPERATE_SUDO:
-        type: choice
+        type: choice 
         description: Use sudo command
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: True
-      GENERAL_INCLUDE:
-        type: choice
-        description: Include general 
-        options:
-        - .+
-        -  
-        required: true
-        default: .+
-      DOCKER_INCLUDE:
-        type: choice
-        description: Include docker
-        options:
-        - .+
-        -  
-        required: true
-        default: .+
+        default: 'True'
       DOCKER_PRUNE:
         type: choice
         description: Docker prune
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: False
+        default: 'False'
       DOCKER_CLEAN:
         type: choice
         description: Docker clean
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: False
+        default: 'False'
       APT_PRUNE:
         type: choice
         description: Apt prune
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: False
+        default: 'False'
       APT_CLEAN:
         type: choice
         description: Apt clean
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: False
+        default: 'False'
       HOMEBREW_PRUNE:
         type: choice
         description: Homebrew prune
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: False
+        default: 'False'
       HOMEBREW_CLEAN:
         type: choice
         description: Homebrew clean
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: False
+        default: 'False'
       NPM_PRUNE:
         type: choice
         description: Npm prune
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: False
-     NPM_CLEAN:
+        default: 'False'
+      NPM_CLEAN:
         type: choice
         description: Npm clean
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False'
         required: true
-        default: False
-     OS_SWAP:
+        default: 'False'
+      OS_SWAP:
         type: choice
         description: OS swap 
         options:
-        - True
-        - False 
+        - 'True'
+        - 'False' 
         required: true
-        default: True
+        default: 'True'
 
 
 jobs:
-  build:
-    if: github.event.repository.owner.id == github.event.sender.id
+  del_runs:
     runs-on: ubuntu-latest
-    # You can use either of the ubuntu-22.04 or ubuntu-latest runner
+    permissions:
+      actions: write
+      contents: read
     steps:
     - name: Display Cleaner Run Parameters
       run: |
@@ -114,8 +98,8 @@ jobs:
         echo "#"
         echo "::group::User Environment Variables"
         echo "OPERATE SUDO: ${{ inputs.OPERATE_SUDO }}"
-        echo "GENERAL INCLUDE: ${{ inputs.GENERAL_INCLUDE }}"
-        echo "DOCKER INCLUDE: ${{ inputs.DOCKER_INCLUDE }}"
+        echo "GENERAL INCLUDE: .+"
+        echo "DOCKER INCLUDE:  .+"
         echo "DOCKER PRUNE: ${{ inputs.DOCKER_PRUNE }}"
         echo "DOCKER CLEAN: ${{ inputs.DOCKER_CLEAN }}"
         echo "APT PRUNE: ${{ inputs.APT_PRUNE }}"
@@ -127,10 +111,9 @@ jobs:
         echo "OS SWAP: ${{ inputs.OS_SWAP }}"
         echo "::endgroup::"
 
-
-     - name: Optimize Disk Space
-       uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
-       with:
+    - name: Optimize Disk Space
+      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
+      with:
           operate_sudo: "${{ inputs.OPERATE_SUDO }}"
           general_include: ".+"
           docker_include: ".+"
@@ -143,3 +126,15 @@ jobs:
           npm_prune: "${{ inputs.NPM_PRUNE }}"
           npm_clean: "${{ inputs.NPM_CLEAN }}"
           os_swap: "${{ inputs.OS_SWAP }}" 
+
+    - name: Disk Space Check
+      run: |
+        sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
+        echo "#"
+        df . -h
+        echo "#"
+        sudo du /usr/ -hx -d 4 --threshold=1G | sort -hr | head
+
+    - name: Disk Cleanup Done
+      run: echo "Workflow storage space cleaning was completed... GoodBye"
+      
