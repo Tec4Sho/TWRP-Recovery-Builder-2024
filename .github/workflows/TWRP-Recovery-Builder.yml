@@ -89,23 +89,7 @@ jobs:
         echo "Release recovery.tar For Samsung devices: ${{ github.event.inputs.RECOVERY_TAR }}"
         echo "::endgroup::"
 
-    - name: Optimize Disk Space
-      if: github.event.inputs.SPACE_SAVER == True
-      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
-      with:
-          operate_sudo: "${{ github.event.inputs.SPACE_SAVER }}"
-          general_include: ".+"
-          docker_include: ".+"
-          docker_prune: "${{ github.event.inputs.SPACE_SAVER }}"
-          docker_clean: "${{ github.event.inputs.SPACE_SAVER }}"
-          apt_prune: "${{ github.event.inputs.SPACE_SAVER }}"
-          apt_clean: "${{ github.event.inputs.SPACE_SAVER }}"
-          homebrew_prune: "${{ github.event.inputs.SPACE_SAVER }}"
-          homebrew_clean: "${{ github.event.inputs.SPACE_SAVER }}"
-          npm_prune: "${{ github.event.inputs.SPACE_SAVER }}"
-          npm_clean: "${{ github.event.inputs.SPACE_SAVER }}"
-          os_swap: "${{ github.event.inputs.SPACE_SAVER }}" 
-           
+    
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
       
