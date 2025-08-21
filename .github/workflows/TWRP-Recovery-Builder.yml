@@ -88,7 +88,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Free Disk Space ultra (Ubuntu)
+    - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
       with:
         # this might remove tools that are actually needed,
@@ -110,8 +110,8 @@ jobs:
         sudo du /usr/ -hx -d 4 --threshold=1G | sort -nr | head
         df . -h    
 
-    - name: Cleanup Extras
-      uses: rokibhasansagar/slimhub_actions@main
+    - name: Disk Space Optimizer
+      uses: hugoalh/disk-space-optimizer-ghaction@v0.8.1
 
     - name: Check Disk Space 3
       run: |
@@ -220,6 +220,10 @@ jobs:
         sudo apt -y install python2
         cd /usr/bin
         sudo ln -sf python2 python
+
+    - name: Check Disk Space 4
+      run: |
+        df . -h    
 
     - name: Building Image 
       run: |
