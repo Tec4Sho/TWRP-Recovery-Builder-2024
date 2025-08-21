@@ -123,7 +123,7 @@ jobs:
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
       with:
-        swap-size-gb: 32
+        swap-size-gb: 12
         
     - name: Prepare The Environment
       run: |
@@ -222,15 +222,19 @@ jobs:
 
     - name: Check Disk Space 4
       run: |
-        df . -h
+        sudo df -h
         find . -maxdepth 6 -type f -size +1G -exec du -h {} + | sort -r
 
     - name: Building Image 
       run: |
         cd workspace
-        source build/envsetup.sh
-        export ALLOW_MISSING_DEPENDENCIES=true
-        lunch ${{ env.DEVICE_MAKEFILE }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
+        (while true; do 
+              df -h
+              sleep 15
+              done) &
+              source build/envsetup.sh
+              export ALLOW_MISSING_DEPENDENCIES=true
+              lunch ${{ env.DEVICE_MAKEFILE }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
       
     - name: Set Build Date # Output will be use in Release
       run: |
