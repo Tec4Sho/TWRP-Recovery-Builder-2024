@@ -222,7 +222,8 @@ jobs:
 
     - name: Check Disk Space 4
       run: |
-        df . -h    
+        df . -h
+        find . -maxdepth 6 -type f -size +1G -exec du -h {} + | sort -r
 
     - name: Building Image 
       run: |
