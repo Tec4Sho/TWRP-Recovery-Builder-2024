@@ -107,21 +107,10 @@ jobs:
         sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | head
         sudo du /usr/ -hx -d 4 --threshold=1G | sort -n | head
 
-    - name: "Optimize Disk Space"
-      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
-      with:
-          operate_sudo: "True"
-          general_include: ".+"
-          docker_include: ".+"
-          docker_prune: "True"
-          docker_clean: "True"
-          apt_prune: "True"
-          apt_clean: "True"
-          homebrew_prune: "True"
-          homebrew_clean: "True"
-          npm_prune: "True"
-          npm_clean: "True"
-          os_swap: "True"
+     # Cleanup The Actions Workspace Using Custom Composite Run Actions
+    - name: Cleanup
+      uses: rokibhasansagar/slimhub_actions@main
+      # That's it! Now use your normal steps
           
     - name: Check Disk Space 3
       run: |
