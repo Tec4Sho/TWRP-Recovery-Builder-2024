@@ -180,7 +180,7 @@ jobs:
       run: |
         cd workspace
         mkdir -p .repo/local_manifests
-        cp -rf templates/*.xml .repo/local_manifests/ 2>/dev/null 
+        # cp -rf templates/*.xml .repo/local_manifests/ 2>/dev/null 
         cp -f ${{ inputs.DEVICE_PATH }}/roomservice.xml .repo/local_manifests/ 2>/dev/null
       continue-on-error: true  
       
@@ -190,7 +190,7 @@ jobs:
         || steps.syncdevicedeps.outcome == 'failure'
       run: |
         cd workspace
-        bash ${GITHUB_WORKSPACE}/scripts/convert.sh ${{ inputs.DEVICE_PATH }}/${{ steps.buildtree.outputs.value }}.dependencies
+        bash ${{ inputs.DEVICE_PATH }}/scripts/convert.sh ${{ inputs.DEVICE_PATH }}/${{ steps.buildtree.outputs.value }}.dependencies
         repo sync -j$(nproc --all)
       continue-on-error: true       
 
