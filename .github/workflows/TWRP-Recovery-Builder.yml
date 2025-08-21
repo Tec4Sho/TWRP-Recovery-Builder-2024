@@ -85,34 +85,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: false
-        
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
-
-    - name: Check disk space 2
+    - name: Check disk space 1
       run: |
         df . -h
-        sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | head 2>/dev/null
-        sudo du /usr/ -hx -d 4 --threshold=1G | sort -n | head 2>/dev/null
+        # sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' 2>/dev/null
+        # sudo du /usr/ -hx -d 4 --threshold=1G 2>/dev/null
 
      # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
       # That's it! Now use your normal steps
           
-    - name: Check Disk Space 3
+    - name: Check Disk Space 2
       run: |
         df . -h
         # sudo rm -rf ${GITHUB_WORKSPACE}/.git
@@ -130,7 +114,7 @@ jobs:
         sudo apt-get update
         sudo apt-get -y upgrade
         sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
-        sudo add-apt-repository universe
+        # sudo add-apt-repository universe
         sudo apt-get -y install libncurses5
 
     - name: Install OpenJDK
@@ -205,7 +189,7 @@ jobs:
     - name: Check Disk Space 4
       run: |
         sudo df -h
-        sudo find . -maxdepth 6 -type f -size +1G -exec du -h {} + | sort -n
+        sudo find . -type f -size +1G -exec du -h {} +
 
     - name: Cache Gradle files 
       uses: actions/cache@v4
@@ -218,13 +202,9 @@ jobs:
     - name: Building Image 
       run: |
         cd workspace
-        (while true; do 
-              df -h
-              sleep 15
-              done) &
-              source build/envsetup.sh
-              export ALLOW_MISSING_DEPENDENCIES=true
-              lunch ${{ env.DEVICE_MAKEFILE }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
+        source build/envsetup.sh
+        export ALLOW_MISSING_DEPENDENCIES=true
+        lunch ${{ env.DEVICE_MAKEFILE }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
       
     - name: Set Build Date # Output will be use in Release
       run: |
