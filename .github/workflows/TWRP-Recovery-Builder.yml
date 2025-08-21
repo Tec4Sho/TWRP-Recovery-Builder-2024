@@ -111,10 +111,12 @@ jobs:
     - name: Check WorkSpace Dir Size
       run: du ${GITHUB_WORKSPACE} -h -d 1    
        
-    - name: Set Swap Space
-      uses: pierotofy/set-swap-space@master
+    - name: Set Up Swap Space
+      uses: thejerrybao/setup-swap-space@v1
       with:
-        swap-size-gb: 24
+        swap-space-path: /mnt/swapfile
+        swap-size-gb: 12
+        remove-existing-swap-files: true
         
     - name: Prepare The Environment
       run: |
