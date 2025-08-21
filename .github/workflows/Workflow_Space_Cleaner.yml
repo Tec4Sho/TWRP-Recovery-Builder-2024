@@ -86,7 +86,7 @@ on:
 
 
 jobs:
-  del_runs:
+  free-disk-space:
     runs-on: ubuntu-latest
     permissions:
       actions: write
