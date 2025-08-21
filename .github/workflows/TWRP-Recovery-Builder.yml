@@ -82,9 +82,6 @@ jobs:
         echo "Release recovery.tar For Samsung devices: ${{ github.event.inputs.RECOVERY_TAR }}"
         echo "::endgroup::"
         
-    - name: Check disk space 1
-      run: df . -h
-        
     - name: Checkout
       uses: actions/checkout@v3
 
@@ -106,13 +103,26 @@ jobs:
 
     - name: Check disk space 2
       run: |
+        df . -h
         sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
         sudo du /usr/ -hx -d 4 --threshold=1G | sort -nr | head
-        df . -h    
 
-    - name: Disk Space Optimizer
-      uses: hugoalh/disk-space-optimizer-ghaction@v0.8.1
-
+    - name: "Optimize Disk Space"
+      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
+      with:
+          operate_sudo: "True"
+          general_include: ".+"
+          docker_include: ".+"
+          docker_prune: "True"
+          docker_clean: "True"
+          apt_prune: "True"
+          apt_clean: "True"
+          homebrew_prune: "True"
+          homebrew_clean: "True"
+          npm_prune: "True"
+          npm_clean: "True"
+          os_swap: "True"
+          
     - name: Check Disk Space 3
       run: |
         df . -h
