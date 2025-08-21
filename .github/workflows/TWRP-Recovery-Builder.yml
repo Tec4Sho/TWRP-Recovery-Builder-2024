@@ -107,7 +107,7 @@ jobs:
     - name: Check disk space 2
       run: |
         sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
-        sudo du /usr/ -hx -d 4 --threshold=1G | sort -hr | head
+        sudo du /usr/ -hx -d 4 --threshold=1G | sort -nr | head
         df . -h    
       
     - name: Check Working Dir Space
