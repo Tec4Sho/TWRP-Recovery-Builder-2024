@@ -178,18 +178,20 @@ jobs:
     
     - name: Create roomservice.xml
       run: |
+        cd workspace
         mkdir -p .repo/local_manifests
-        cp -f templates/*.xml .repo/local_manifests/ >/dev/null || cp -f roomservice.xml .repo/local_manifests/ >/dev/null
-      working-directory: workspace    
-
+        cp -rf templates/*.xml .repo/local_manifests/ 2>/dev/null 
+        cp -f ${{ inputs.DEVICE_PATH }}/roomservice.xml .repo/local_manifests/ 2>/dev/null
+      continue-on-error: true  
+      
     - name: Sync Device Dependencies (Omni/subdevices)
       if: |
         steps.buildtree.outputs.value == 'omni'
         || steps.syncdevicedeps.outcome == 'failure'
       run: |
+        cd workspace
         bash ${GITHUB_WORKSPACE}/scripts/convert.sh ${{ inputs.DEVICE_PATH }}/${{ steps.buildtree.outputs.value }}.dependencies
         repo sync -j$(nproc --all)
-      working-directory: workspace
       continue-on-error: true       
 
     - name: Clone Device Tree
@@ -225,10 +227,10 @@ jobs:
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch ${{ env.DEVICE_MAKEFILE }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
-        echo "Done building your ${{ github.event.inputs.BUILD_TARGET }}.img"
       
     - name: Set Build Date # Output will be use in Release
       run: |
+        echo "Done building your ${{ github.event.inputs.BUILD_TARGET }}.img"
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
         DEVICE_TREE_URL="${{ github.event.inputs.DEVICE_TREE }}"
         if [[ "${DEVICE_TREE_URL}" == *.git ]]; then
