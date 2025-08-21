@@ -85,20 +85,27 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Check disk space 1
-      run: |
-        df . -h
-        # sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' 2>/dev/null
-        # sudo du /usr/ -hx -d 4 --threshold=1G 2>/dev/null
-
      # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup
-      uses: rokibhasansagar/slimhub_actions@main
-      # That's it! Now use your normal steps
-          
-    - name: Check Disk Space 2
       run: |
-        df . -h
+        echo "Listing 100 largest packages"
+        dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
+        df -h
+        echo "Removing large packages"
+        sudo apt-get remove -y '^ghc-8.*'
+        sudo apt-get remove -y '^dotnet-.*'
+        sudo apt-get remove -y '^llvm-.*'
+        sudo apt-get remove -y 'php.*'
+        sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel
+        sudo apt-get autoremove -y
+        sudo apt-get clean
+        df -h
+        echo "Removing large directories"
+        # deleting 15GB
+        rm -rf /usr/share/dotnet/
+        df -h
+        # uses: rokibhasansagar/slimhub_actions@main
+        # That's it! Now use your normal steps
         # sudo rm -rf ${GITHUB_WORKSPACE}/.git
 
     - name: Check WorkSpace Dir Size
@@ -114,7 +121,7 @@ jobs:
         sudo apt-get update
         sudo apt-get -y upgrade
         sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
-        # sudo add-apt-repository universe
+        sudo add-apt-repository universe
         sudo apt-get -y install libncurses5
 
     - name: Install OpenJDK
@@ -186,18 +193,14 @@ jobs:
         cd /usr/bin
         sudo ln -sf python2 python
 
-    - name: Check Disk Space 4
+    - name: Check Build Space 
       run: |
-        sudo df -h
-        sudo find . -type f -size +1G -exec du -h {} +
-
-    - name: Cache Gradle files 
-      uses: actions/cache@v4
-      with: 
-        path: ~/.gradle/caches 
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }} 
-        restore-keys: |
-          ${{ runner.os }}-gradle-     
+        sudo df -hc
+        cd workspace
+        echo
+        sudo df . -h
+        echo
+        sudo find . -type f -size +200M -exec du -ha {} +
 
     - name: Building Image 
       run: |
