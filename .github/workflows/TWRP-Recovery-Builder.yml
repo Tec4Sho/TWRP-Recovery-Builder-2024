@@ -226,7 +226,7 @@ jobs:
         find . -maxdepth 6 -type f -size +1G -exec du -h {} + | sort -r
 
     - name: Cache Gradle files 
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with: 
         path: ~/.gradle/caches 
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }} 
