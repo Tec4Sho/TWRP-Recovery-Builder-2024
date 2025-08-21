@@ -225,6 +225,14 @@ jobs:
         sudo df -h
         find . -maxdepth 6 -type f -size +1G -exec du -h {} + | sort -r
 
+    - name: Cache Gradle files 
+      uses: actions/cache@v2
+      with: 
+        path: ~/.gradle/caches 
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }} 
+        restore-keys: |
+          ${{ runner.os }}-gradle-     
+
     - name: Building Image 
       run: |
         cd workspace
@@ -232,7 +240,7 @@ jobs:
               df -h
               sleep 15
               done) &
-              source build/envsetup.sh
+              ./gradlew build/envsetup.sh
               export ALLOW_MISSING_DEPENDENCIES=true
               lunch ${{ env.DEVICE_MAKEFILE }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
       
