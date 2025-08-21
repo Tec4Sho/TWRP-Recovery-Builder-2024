@@ -109,9 +109,6 @@ jobs:
         sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
         sudo du /usr/ -hx -d 4 --threshold=1G | sort -nr | head
         df . -h    
-      
-    - name: Check Working Dir Space
-      run: du ${GITHUB_WORKSPACE} -h -d 1
 
     - name: Cleanup Extras
       uses: rokibhasansagar/slimhub_actions@main
@@ -120,13 +117,16 @@ jobs:
       run: |
         df . -h
         # sudo rm -rf ${GITHUB_WORKSPACE}/.git
+
+    - name: Check WorkSpace Dir Size
+      run: du ${GITHUB_WORKSPACE} -h -d 1    
        
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
       with:
         swap-size-gb: 24
         
-    - name: Prepare the environment
+    - name: Prepare The Environment
       run: |
         sudo apt update
         sudo apt -y upgrade
@@ -147,13 +147,21 @@ jobs:
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
 
+    - name: Check Build Tree
+      uses: haya14busa/action-cond@v1.2.1
+      id: buildtree
+      with:
+        cond: ${{ inputs.MANIFEST_BRANCH == '11' || inputs.MANIFEST_BRANCH == '12.1' }}
+        if_true: aosp
+        if_false: omni    
+
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
       id: manifest
       with:
         cond: ${{ github.event.inputs.MANIFEST_BRANCH == 'twrp-11' || github.event.inputs.MANIFEST_BRANCH == 'twrp-12.1'  || github.event.inputs.MANIFEST_BRANCH == 'twrp-14.1' }}
         if_true: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git
-        if_false: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni.git
+        if_false: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni.git 
 
     - name: Initialize Repo
       run: |
@@ -167,6 +175,22 @@ jobs:
       run: |
         cd workspace
         repo sync -j$(nproc --all) --force-sync
+    
+    - name: Create roomservice.xml
+      run: |
+        mkdir -p .repo/local_manifests
+        cp -f templates/*.xml .repo/local_manifests/ >/dev/null || cp -f roomservice.xml .repo/local_manifests/ >/dev/null
+      working-directory: workspace    
+
+    - name: Sync Device Dependencies (Omni/subdevices)
+      if: |
+        steps.buildtree.outputs.value == 'omni'
+        || steps.syncdevicedeps.outcome == 'failure'
+      run: |
+        bash ${GITHUB_WORKSPACE}/scripts/convert.sh ${{ inputs.DEVICE_PATH }}/${{ steps.buildtree.outputs.value }}.dependencies
+        repo sync -j$(nproc --all)
+      working-directory: workspace
+      continue-on-error: true       
 
     - name: Clone Device Tree
       run: |
@@ -235,6 +259,8 @@ jobs:
     - name: Include Recovery Installer
       run: |
         if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} = true ]; then
+          export USE_RECOVERY_INSTALLER=true
+          export RECOVERY_INSTALLER_PATH=bootable/recovery/installer
           cd workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/
           wget https://github.com/kinguser981/recovery-installer/releases/download/zip/recovery-installer.zip
           zip -ur recovery-installer.zip ${{ env.RECOVERY_TYPE }}.img
