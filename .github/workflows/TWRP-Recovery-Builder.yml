@@ -109,7 +109,7 @@ jobs:
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 1000 # Example: Reserve 512 MB for the root directory
+        root-reserve-mb: 8000 # Example: Reserve 512 MB for the root directory
         remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
 
