@@ -104,14 +104,14 @@ jobs:
         # uses: rokibhasansagar/slimhub_actions@main
         # That's it! Now use your normal steps
         # sudo rm -rf ${GITHUB_WORKSPACE}/.git
-      continue-on-error: false
+      continue-on-error: true
 
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 1000 # Example: Reserve 512 MB for the root directory
         remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
-      continue-on-error: false
+      continue-on-error: true
 
     - name: Check WorkSpace Dir Size
       run: du ${GITHUB_WORKSPACE} -h -d 1    
@@ -119,8 +119,8 @@ jobs:
     - name: Set Up Swap Space
       uses: thejerrybao/setup-swap-space@v1
       with:
-        swap-space-path: /mnt/swapfile
-        swap-size-gb: 12
+        swap-space-path: /dev/dm-0/swapfile
+        swap-size-gb: 8
         remove-existing-swap-files: true
         
     - name: Prepare The Environment
