@@ -195,12 +195,13 @@ jobs:
 
     - name: Check Build Space 
       run: |
-        sudo df -hc
+        sudo df -h
         cd workspace
         echo
         sudo df . -h
         echo
         sudo find . -type f -size +200M -exec du -ha {} +
+      continue-on-error: false  
 
     - name: Building Image 
       run: |
