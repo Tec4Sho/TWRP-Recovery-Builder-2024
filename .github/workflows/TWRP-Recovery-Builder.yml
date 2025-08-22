@@ -46,17 +46,22 @@ on:
         description: 'Release Recovery.tar For Samsung devices'
         required: false
         default: false
-        type: string #boolean
+        type: boolean
       RECOVERY_INSTALLER:
         description: 'Include recovery installer.zip'
-        type: string #boolean
+        type: boolean
         required: true
         default: true
-      SPACE_SAVER:
-        description: 'Cleans homebrew, docker, npm, apt & os swap'
-        type: string #boolean
+      MAXIMIZE_BUILD_SPACE:
+        description: 'Cleans and remap storage paths'
+        type: boolean
         required: false
-        default: False
+        default: false
+      USER_EMAIL:
+        description: 'Add github user email'
+        type: string
+        required: true
+        default: 'tec4sho@gmail.com'
         
 jobs:
   build:
@@ -71,15 +76,13 @@ jobs:
     - name: Display Inputs
       run: |
         echo "::group::User Environment Variables"
-        echo "Displaying variables/inputs."
+        echo "Displaying main variables/inputs."
         echo "Manifest Branch: ${{ github.event.inputs.MANIFEST_BRANCH }}"
         echo "Device Tree: ${{ github.event.inputs.DEVICE_TREE }}"
         echo "Device Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}"
         echo "Device Path: ${{ github.event.inputs.DEVICE_PATH }}"
         echo "Device Name: ${{ github.event.inputs.DEVICE_NAME }}"
-        echo "Build Target: ${{ github.event.inputs.BUILD_TARGET }}image"
-        echo "Include Recovery Installer: ${{ github.event.inputs.RECOVERY_INSTALLER }}"
-        echo "Release recovery.tar For Samsung devices: ${{ github.event.inputs.RECOVERY_TAR }}"
+        echo "Build Target: ${{ github.event.inputs.BUILD_TARGET }}image"     
         echo "::endgroup::"
         
     - name: Checkout
@@ -107,9 +110,11 @@ jobs:
       continue-on-error: true
 
     - name: Maximize build space
+      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == true
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 2000 # Example: Reserve 512 MB for the root directory
+        root-reserve-mb: 12000 # Example: Reserve 512 MB for the root directory
+        swap-size-gb: 4 # Example: Reserve 4GB for swap file
         remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
 
@@ -120,7 +125,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get -y upgrade
-        sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
+        sudo apt-get install git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig git repo 
+        # sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
         sudo add-apt-repository universe
         sudo apt-get -y install libncurses5
 
@@ -157,10 +163,10 @@ jobs:
       run: |
         mkdir -p $GITHUB_WORKSPACE/workspace
         cd workspace
-        git config --global user.name "Tec4Sho"
-        git config --global user.email "tec4sho@gmail.com"
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "{{ github.event.inputs.USER_EMAIL }}"
         repo init --depth=1 -u ${{ steps.manifest.outputs.value }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
-  
+        
     - name: Repo Sync
       run: |
         cd workspace
@@ -189,21 +195,30 @@ jobs:
     - name: Install Python 2
       if: github.event.inputs.MANIFEST_BRANCH != 'twrp-11' && github.event.inputs.MANIFEST_BRANCH != 'twrp-12.1'  && github.event.inputs.MANIFEST_BRANCH != 'twrp-14'
       run: |
+        sudo apt-get -y remove python
         sudo apt-get -y install python2
         cd /usr/bin
         sudo ln -sf python2 python
+      continue-on-error: true
 
     - name: Check Build Space 
       run: |
+        echo '### Before clean ###'
         sudo df -h
+        sudo rm -rf /usr/share/dotnet/ >/dev/null
+        sudo rm -Rf ${GITHUB_WORKSPACE}/.git >/dev/null
+        echo '### After clean ###' 
+        sudo df -h
+        echo
         cd workspace
         echo # workspace dir #
         sudo df . -h
         echo # large files in workspace dir #
-        sudo find . -type f -size +100M -exec du -ha {} +
+        # sudo find . -type f -size +100M -exec du -ha {} +
+        sudo find . -type f -size +100M -print
         # Make missing ninja_log
-        touch out/.ninja_log
-      continue-on-error: false  
+        echo >> ${GITHUB_WORKSPACE}/out/.ninja_log        
+      continue-on-error: true
 
     - name: Building Image 
       run: |
