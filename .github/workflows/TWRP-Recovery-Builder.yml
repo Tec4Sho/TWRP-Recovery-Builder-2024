@@ -114,14 +114,7 @@ jobs:
       continue-on-error: true
 
     - name: Check WorkSpace Dir Size
-      run: du ${GITHUB_WORKSPACE} -h -d 1    
-       
-    - name: Set Up Swap Space
-      uses: thejerrybao/setup-swap-space@v1
-      with:
-        swap-space-path: /dev/dm-0/swapfile
-        swap-size-gb: 8
-        remove-existing-swap-files: true
+      run: du ${GITHUB_WORKSPACE} -h -d 5    
         
     - name: Prepare The Environment
       run: |
