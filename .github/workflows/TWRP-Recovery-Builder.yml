@@ -29,6 +29,11 @@ on:
         description: 'Specify your Device Codename' 
         required: true
         default: 'tb8163p3'
+      USER_EMAIL:
+        description: 'Specify your User Email'
+        type: string
+        required: true
+        default: 'tec4sho@gmail.com'  
       BUILD_TARGET:
         description: 'Specify your Build Target' 
         required: true
@@ -46,18 +51,13 @@ on:
       RECOVERY_INSTALLER:
         description: 'Include recovery installer.zip'
         type: boolean
-        required: true
+        required: false
         default: true
       MAXIMIZE_BUILD_SPACE:
         description: 'Cleans and remap storage paths'
         type: boolean
         required: false
-        default: false
-      USER_EMAIL:
-        description: 'Add github user email'
-        type: string
-        required: true
-        default: 'tec4sho@gmail.com'
+        default: true
         
 jobs:
   build:
@@ -106,7 +106,7 @@ jobs:
       continue-on-error: true
 
     - name: Maximize build space
-      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == true
+      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 12000 # Example: Reserve 512 MB for the root directory
