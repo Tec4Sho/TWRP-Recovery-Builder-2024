@@ -109,8 +109,8 @@ jobs:
       if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 12000 # Example: Reserve 512 MB for the root directory
-        swap-size-gb: 4 # Example: Reserve 4GB for swap file
+        root-reserve-mb: 9000 # Example: Reserve 512 MB for the root directory
+        swap-size-mb: 4096 # Example: Reserve 4GB for swap file
         remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
 
@@ -202,7 +202,7 @@ jobs:
         echo '### Before clean ###'
         sudo df -h
         sudo rm -rf /usr/share/dotnet/ >/dev/null
-        sudo rm -Rf ${GITHUB_WORKSPACE}/.git >/dev/null
+        sudo rm -rf ${GITHUB_WORKSPACE}/.git >/dev/null
         echo '### After clean ###' 
         sudo df -h
         echo
@@ -210,10 +210,14 @@ jobs:
         echo # workspace dir #
         sudo df . -h
         echo # large files in workspace dir #
-        # sudo find . -type f -size +100M -exec du -ha {} +
-        sudo find . -type f -size +100M -print
+        sudo find . -type f -size +100M -exec du -ha {} +
+        # sudo find . -type f -size +100M -print
         # Make missing ninja_log
-        echo >> ${GITHUB_WORKSPACE}/out/.ninja_log        
+        if [ ! -f ${GITHUB_WORKSPACE}/out/.ninja_log ]; then
+            echo '#' > ${GITHUB_WORKSPACE}/out/.ninja_log 2> /dev/null
+        fi
+        # clean build environment space
+        sudo apt-get remove -y kubectl powershell firefox temurin-11-jdk temurin-17-jdk temurin-21-jdk google-chrome-stable dotnet-sdk-8.0 google-cloud-cli microsoft-edge-stable azure-cli
       continue-on-error: true
 
     - name: Building Image 
