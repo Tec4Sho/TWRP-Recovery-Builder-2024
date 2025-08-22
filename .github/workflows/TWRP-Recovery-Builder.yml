@@ -115,8 +115,8 @@ jobs:
       if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 15000 # Example: Reserve 12 GB for the root directory
-        swap-size-mb: 4096 # Example: Reserve 4 GB for swap file
+        root-reserve-mb: 10000 # Example: Reserve 10 GB for the root directory
+        swap-size-mb: 1024 # Example: Reserve 1 GB for swap file
         remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
 
