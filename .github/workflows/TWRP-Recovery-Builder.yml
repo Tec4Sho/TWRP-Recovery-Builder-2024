@@ -105,12 +105,18 @@ jobs:
         # sudo rm -rf ${GITHUB_WORKSPACE}/.git
       continue-on-error: true
 
+      # Cleanup The Actions Workspace Using Custom Composite Run Actions
+    - name: Cleanup build space
+      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
+      uses: rokibhasansagar/slimhub_actions@main
+      # That's it! Now use your normal steps  
+
     - name: Maximize build space
       if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 4096 # Example: Reserve 512 MB for the root directory
-        swap-size-mb: 4096 # Example: Reserve 4GB for swap file
+        root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
+        swap-size-mb: 4096 # Example: Reserve 4 GB for swap file
         remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
 
@@ -205,8 +211,8 @@ jobs:
         echo '### cleaning build environment space ###'
         # clean build environment space
         sudo apt-get remove -y kubectl powershell firefox temurin-11-jdk temurin-17-jdk temurin-21-jdk google-chrome-stable dotnet-sdk-8.0 google-cloud-cli microsoft-edge-stable azure-cli
-        sudo rm -rf /usr/share/dotnet/ >/dev/null
-        sudo rm -rf ${GITHUB_WORKSPACE}/.git >/dev/null
+        sudo rm -vrf /usr/share/dotnet/ >/dev/null
+        sudo rm -vrf ${GITHUB_WORKSPACE}/.git >/dev/null
         echo '### After clean ###' 
         sudo df -h
         cd workspace
@@ -217,8 +223,8 @@ jobs:
         echo '### large files in workspace dir ###'
         sudo find . -type f -size +100M -exec du -ha {} +
         # Make missing ninja_log
-        if [ ! -f out/.ninja_log ]; then
-            echo '# ninja_log made #' &> out/.ninja_log
+        if [ ! -f ${GITHUB_WORKSPACE}/workspace/out/.ninja_log ]; then
+            echo '# ninja_log made #' &> ${GITHUB_WORKSPACE}/workspace/out/.ninja_log
         fi
       continue-on-error: true
 
