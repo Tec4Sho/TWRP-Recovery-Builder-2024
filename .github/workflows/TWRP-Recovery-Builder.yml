@@ -16,7 +16,7 @@ on:
       DEVICE_TREE:
         description: 'Custom Recovery Tree' 
         required: true
-        default: 'https://github.com/Tec4Sho/android_device_alps_tb8163p3.git'
+        default: 'https://github.com/Tec4Sho/android_device_alps_tb8163p3'
       DEVICE_TREE_BRANCH:
         description: 'Custom Recovery Tree Branch' 
         required: true
