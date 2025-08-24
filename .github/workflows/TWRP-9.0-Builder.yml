@@ -226,7 +226,7 @@ jobs:
       continue-on-error: true
 
     - name: Check Workspace Contents
-      run: du ${GITHUB_WORKSPACE} -ha   
+      run: du ${GITHUB_WORKSPACE} -h 
 
     - name: Building Image 
       run: |
