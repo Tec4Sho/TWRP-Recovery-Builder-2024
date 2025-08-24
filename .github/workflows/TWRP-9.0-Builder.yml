@@ -207,7 +207,7 @@ jobs:
         echo
         echo '### cleaning build environment space ###'
         # clean build environment space
-        sudo apt-get remove -y kubectl powershell firefox temurin-11-jdk temurin-17-jdk temurin-21-jdk google-chrome-stable dotnet-sdk-8.0 google-cloud-cli microsoft-edge-stable azure-cli Libllvm13 libllvm15 google-cloud-cli-anthoscli
+        sudo apt-get remove -y kubectl powershell firefox temurin-11-jdk temurin-17-jdk temurin-21-jdk google-chrome-stable dotnet-sdk-8.0 google-cloud-cli microsoft-edge-stable azure-cli google-cloud-cli-anthoscli
         sudo rm -vrf /usr/share/dotnet/ >/dev/null
         # sudo rm -vrf ${GITHUB_WORKSPACE}/.git >/dev/null
         echo '### After clean ###' 
@@ -228,6 +228,10 @@ jobs:
     - name: Check Workspace Contents
       run: du ${GITHUB_WORKSPACE} -h 
 
+    - name: Create Ninja_log File
+      run: ninja -t restat
+      continue-on-error: true
+      
     - name: Building Image 
       run: |
         cd workspace
