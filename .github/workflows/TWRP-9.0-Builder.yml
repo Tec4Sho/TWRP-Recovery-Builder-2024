@@ -220,7 +220,7 @@ jobs:
         echo '### large files in workspace dir ###'
         sudo find . -type f -size +100M -exec du -ha {} +
         # Make missing ninja_log
-        if [ ! -f ${GITHUB_WORKSPACE}/workspace/out/.ninja_log ]; then
+        if [ -d ${GITHUB_WORKSPACE}/workspace/out/ ]; then
             echo '# ninja_log made #' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log
         fi
       continue-on-error: true
