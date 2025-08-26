@@ -46,18 +46,18 @@ on:
       RECOVERY_TAR:
         description: 'Release Recovery.tar For Samsung devices'
         required: false
-        default: false
-        type: boolean
+        default: 'false'
+        type: string #boolean
       RECOVERY_INSTALLER:
         description: 'Include recovery installer.zip'
-        type: boolean
+        type: string
         required: false
-        default: true
+        default: 'true'
       MAXIMIZE_BUILD_SPACE:
         description: 'Cleans and remap storage paths'
-        type: boolean
+        type: string
         required: false
-        default: true
+        default: 'true'
         
 jobs:
   build:
@@ -107,30 +107,30 @@ jobs:
 
       # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup build space
-      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == true }}
+      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
       uses: rokibhasansagar/slimhub_actions@main
       # That's it! Now use your normal steps  
 
     - name: Maximize build space
-      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == true }}
+      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
         swap-size-mb: 4096 # Example: Reserve 4 GB for swap file
-        remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
+        remove-dotnet: 'false' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
 
     - name: Create Ninja_log File
       run: ninja -t restat
-      continue-on-error: true   
+      continue-on-error: true
         
     - name: Prepare The Environment
       run: |
         sudo apt-get update
         sudo apt-get -y upgrade
-        sudo apt-get install git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip lzma fontconfig git repo 
-        # sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
         sudo add-apt-repository universe
+        sudo apt-get install git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip lzma xz-utils fontconfig git repo 
+        # sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
         sudo apt-get -y install libncurses5
         # sudo apt-get -y install xz-utils
       continue-on-error: true
@@ -274,7 +274,7 @@ jobs:
 
     - name: Include Recovery Installer
       run: |
-        if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} == true ]; then
+        if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} == 'true' ]; then
           export USE_RECOVERY_INSTALLER=true
           export RECOVERY_INSTALLER_PATH=bootable/recovery/installer
           cd workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/
@@ -285,7 +285,7 @@ jobs:
         
     - name: Recovery to tar for Samsung devices
       run: |
-        if [ ${{ github.event.inputs.RECOVERY_TAR }} == true ]; then
+        if [ ${{ github.event.inputs.RECOVERY_TAR }} == 'true' ]; then
           cd workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/
           tar -cvf ${{ env.RECOVERY_TYPE }}.tar ${{ env.RECOVERY_TYPE }}.img
         fi
