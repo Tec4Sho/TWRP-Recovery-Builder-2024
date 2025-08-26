@@ -80,6 +80,10 @@ jobs:
         echo "Device Name: ${{ github.event.inputs.DEVICE_NAME }}"
         echo "Build Target: ${{ github.event.inputs.BUILD_TARGET }}image"     
         echo "::endgroup::"
+
+    - name: Run Ninja_log Stats
+      run: ninja -t restat
+      continue-on-error: true
         
     - name: Checkout
       uses: actions/checkout@v3
@@ -117,7 +121,7 @@ jobs:
       with:
         root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
         swap-size-mb: 4096 # Example: Reserve 4 GB for swap file
-        remove-dotnet: true # Example: Remove the .NET SDK to free space 
+        remove-dotnet: 'false' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
         
     - name: Prepare The Environment
@@ -143,6 +147,7 @@ jobs:
         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
+        
     - name: Check Build Tree
       uses: haya14busa/action-cond@v1.2.1
       id: buildtree
@@ -227,11 +232,7 @@ jobs:
       continue-on-error: true
 
     - name: Check Workspace Contents
-      run: du ${GITHUB_WORKSPACE} -h 
-
-    - name: Create Ninja_log File
-      run: ninja -t restat
-      continue-on-error: true
+      run: du ${GITHUB_WORKSPACE} -h -d 1
       
     - name: Building Image 
       run: |
