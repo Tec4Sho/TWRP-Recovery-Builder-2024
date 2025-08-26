@@ -121,7 +121,7 @@ jobs:
       with:
         root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
         swap-size-mb: 4096 # Example: Reserve 4 GB for swap file
-        remove-dotnet: 'false' # Example: Remove the .NET SDK to free space 
+        remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
         
     - name: Prepare The Environment
