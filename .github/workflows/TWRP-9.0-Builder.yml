@@ -46,18 +46,18 @@ on:
       RECOVERY_TAR:
         description: 'Release Recovery.tar For Samsung devices'
         required: false
-        default: 'false'
-        type: string #boolean
+        default: false
+        type: boolean # boolean
       RECOVERY_INSTALLER:
         description: 'Include recovery installer.zip'
-        type: string
+        type: boolean
         required: false
-        default: 'true'
+        default: true
       MAXIMIZE_BUILD_SPACE:
         description: 'Cleans and remap storage paths'
         type: string
         required: false
-        default: 'true'
+        default: true
         
 jobs:
   build:
@@ -107,17 +107,17 @@ jobs:
 
       # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup build space
-      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
+      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == true }}
       uses: rokibhasansagar/slimhub_actions@main
       # That's it! Now use your normal steps  
 
     - name: Maximize build space
-      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
+      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == true }}
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
         swap-size-mb: 4096 # Example: Reserve 4 GB for swap file
-        remove-dotnet: 'false' # Example: Remove the .NET SDK to free space 
+        remove-dotnet: false # Example: Remove the .NET SDK to free space 
       continue-on-error: true
 
     - name: Create Ninja_log File
@@ -274,7 +274,7 @@ jobs:
 
     - name: Include Recovery Installer
       run: |
-        if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} == 'true' ]; then
+        if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} == true ]; then
           export USE_RECOVERY_INSTALLER=true
           export RECOVERY_INSTALLER_PATH=bootable/recovery/installer
           cd workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/
@@ -285,7 +285,7 @@ jobs:
         
     - name: Recovery to tar for Samsung devices
       run: |
-        if [ ${{ github.event.inputs.RECOVERY_TAR }} == 'true' ]; then
+        if [ ${{ github.event.inputs.RECOVERY_TAR }} == true ]; then
           cd workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/
           tar -cvf ${{ env.RECOVERY_TYPE }}.tar ${{ env.RECOVERY_TYPE }}.img
         fi
