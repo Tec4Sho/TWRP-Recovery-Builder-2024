@@ -1,4 +1,4 @@
-name: TWRP Recovery Builder 2025
+name: TWRP Builder 2025
 
 on:
   workflow_dispatch:
@@ -107,12 +107,12 @@ jobs:
 
       # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup build space
-      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
+      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == true }}
       uses: rokibhasansagar/slimhub_actions@main
       # That's it! Now use your normal steps  
 
     - name: Maximize build space
-      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true' }}
+      if: ${{ github.event.inputs.MAXIMIZE_BUILD_SPACE == true }}
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
@@ -128,7 +128,7 @@ jobs:
         # sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
         sudo add-apt-repository universe
         sudo apt-get -y install libncurses5
-        sudo apt-get-y install xz-utils
+        sudo apt-get -y install xz-utils
       continue-on-error: true
 
     - name: Install OpenJDK
@@ -220,8 +220,9 @@ jobs:
         echo '### large files in workspace dir ###'
         sudo find . -type f -size +100M -exec du -ha {} +
         # Make missing ninja_log
-        if [ -d ${GITHUB_WORKSPACE}/workspace/out/ ]; then
-            echo '# ninja_log made #' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log
+        if [ !-d ${GITHUB_WORKSPACE}/workspace/out ]; then
+            mkdir -p ${GITHUB_WORKSPACE}/workspace/out
+            echo '# ninja_log' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log
         fi
       continue-on-error: true
 
