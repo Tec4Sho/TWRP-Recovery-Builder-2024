@@ -1,4 +1,4 @@
-name: TWRP Builder 2025
+name: TWRP Recovery 2025
 
 on:
   workflow_dispatch:
@@ -47,17 +47,17 @@ on:
         description: 'Release Recovery.tar For Samsung devices'
         type: boolean
         required: false
-        default: false
+        default: 'false'
       RECOVERY_INSTALLER:
         description: 'Include recovery installer.zip'
         type: boolean
         required: false
-        default: true
+        default: 'true'
       MAXIMIZE_BUILD_SPACE:
         description: 'Cleans and remap storage paths'
         type: boolean
         required: false
-        default: true
+        default: 'true'
         
 jobs:
   build:
@@ -107,12 +107,12 @@ jobs:
 
           # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup build space
-      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == true
+      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true'
       uses: rokibhasansagar/slimhub_actions@main
       # That's it! Now use your normal steps  
 
     - name: Maximize build space
-      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == true
+      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true'
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
@@ -271,7 +271,7 @@ jobs:
         fi
     - name: Include Recovery Installer
       run: |
-        if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} = true ]; then
+        if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} = 'true' ]; then
           export USE_RECOVERY_INSTALLER=true
           export RECOVERY_INSTALLER_PATH=bootable/recovery/installer
           cd workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/
@@ -282,7 +282,7 @@ jobs:
         
     - name: Recovery to tar for Samsung devices
       run: |
-        if [ ${{ github.event.inputs.RECOVERY_TAR }} = true ]; then
+        if [ ${{ github.event.inputs.RECOVERY_TAR }} = 'true' ]; then
           cd workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/
           tar -cvf ${{ env.RECOVERY_TYPE }}.tar ${{ env.RECOVERY_TYPE }}.img
         fi
