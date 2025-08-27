@@ -81,9 +81,9 @@ jobs:
         echo "Build Target: ${{ github.event.inputs.BUILD_TARGET }}image"     
         echo "::endgroup::"
 
-    #- name: Run Ninja_log Stats
-     # run: ninja -t restat
-    #  continue-on-error: true
+    - name: Run Ninja_log Stats
+      run: ninja -t restat
+      continue-on-error: true
         
     - name: Checkout
       uses: actions/checkout@v3
@@ -214,7 +214,7 @@ jobs:
         echo
         echo '### cleaning build environment space ###'
         # clean build environment space
-        sudo apt-get remove -y kubectl powershell firefox dotnet-sdk-8.0 azure-cli
+        sudo apt-get remove -y kubectl powershell firefox dotnet-sdk-8.0 dotnet-sdk-9.0 azure-cli temurin-11-jdk temurin-17-jdk
         sudo rm -vrf /usr/share/dotnet/ >/dev/null
         echo '### After clean ###' 
         sudo df -h
