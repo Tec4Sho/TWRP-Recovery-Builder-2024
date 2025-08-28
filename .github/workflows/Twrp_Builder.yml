@@ -320,7 +320,7 @@ jobs:
           
     - name: Checking For Missing Dependencies
       run: |
-        cd tools
+        cd Exit
         mv -n libneeds ${GITHUB_WORKSPACE}/workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/
         mv -n ldcheck ${GITHUB_WORKSPACE}/workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/
         cd ../workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root
