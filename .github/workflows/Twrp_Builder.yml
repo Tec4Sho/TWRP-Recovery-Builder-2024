@@ -116,7 +116,7 @@ jobs:
       # That's it! Now use your normal steps  
 
     - name: Maximize build space
-      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true'
+      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == 'false'
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
