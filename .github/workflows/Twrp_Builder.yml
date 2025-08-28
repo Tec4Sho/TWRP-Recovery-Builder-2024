@@ -116,11 +116,11 @@ jobs:
       # That's it! Now use your normal steps  
 
     - name: Maximize build space
-      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == 'false'
+      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true'
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 12000 # Example: Reserve 12 GB for the root directory
-        swap-size-mb: 4096 # Example: Reserve 4 GB for swap file
+        root-reserve-mb: 11000 # Example: Reserve 12 GB for the root directory
+        swap-size-mb: 2048 # Example: Reserve 4 GB for swap file
         remove-dotnet: 'true' # Example: Remove the .NET SDK to free space 
       continue-on-error: true
         
