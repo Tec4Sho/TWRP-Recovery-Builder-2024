@@ -128,8 +128,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get -y upgrade
-        #sudo apt-get install git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig git repo 
-        sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
+        sudo apt-get install git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig git repo xz-lzma-compat m4 ncurses-compat-libs libstdc++ libstdc++-14.2.1-3.fc40.i686
+        # sudo apt-get -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib lib32ncurses5-dev x11proto-core-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libtinfo5 libgflags-dev
+        # sudo apt-get -y install xz-lzma-compat m4 ncurses-compat-libs libstdc++ libstdc++-14.2.1-3.fc40.i686
         sudo add-apt-repository universe
         sudo apt-get -y install libncurses5
       continue-on-error: true
@@ -174,12 +175,12 @@ jobs:
     - name: Repo Sync
       run: |
         cd workspace
-        repo sync -j$(nproc --all) --force-sync
-    
+        # repo sync -j$(nproc --all) --force-sync
+        repo sync -j 1 --fail-fast
+
     - name: Clone Device Tree
       run: |
         cd workspace
-        export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
         mkdir -p ${{ github.event.inputs.DEVICE_PATH }}
         git clone ${{ github.event.inputs.DEVICE_TREE }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
         # cd ${{ github.event.inputs.DEVICE_PATH }}
@@ -201,9 +202,13 @@ jobs:
       if: github.event.inputs.MANIFEST_BRANCH != 'twrp-11' && github.event.inputs.MANIFEST_BRANCH != 'twrp-12.1'  && github.event.inputs.MANIFEST_BRANCH != 'twrp-14'
       run: |
         sudo apt-get -y remove python
-        sudo apt-get -y install python2
+        # sudo apt-get -y install python2
+        sudo apt-get -y install python2.7
+        sudo alternatives --install /usr/bin/python python /usr/bin/python2.7 1
+        sudo alternatives --install /usr/bin/python python /usr/bin/python3.12 2
+        sudo update-alternatives --config python
         cd /usr/bin
-        sudo ln -sf python2 python
+        sudo ln -sf python2.7 python
       continue-on-error: true
 
     - name: Check Build Space 
@@ -213,7 +218,7 @@ jobs:
         echo
         echo '### cleaning build environment space ###'
         # clean build environment space
-        sudo apt-get remove -y kubectl powershell firefox dotnet-sdk-8.0 dotnet-sdk-9.0 dotnet-runtime-8.0 azure-cli docker-ce libllvm13 libllvm14 libllvm15
+        sudo apt-get remove -y kubectl powershell firefox dotnet-sdk-8.0 dotnet-runtime-8.0 azure-cli docker-ce libllvm13 libllvm14 libllvm15
         sudo rm -vrf /usr/share/dotnet/ >/dev/null
         echo '### After clean ###' 
         sudo df -h
@@ -238,8 +243,10 @@ jobs:
       run: |
         cd workspace
         source build/envsetup.sh
+        export 
         export ALLOW_MISSING_DEPENDENCIES=true
         export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+        export LC_ALL=C
         lunch ${{ env.DEVICE_MAKEFILE }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
       
     - name: Set Build Date # Output will be use in Release
