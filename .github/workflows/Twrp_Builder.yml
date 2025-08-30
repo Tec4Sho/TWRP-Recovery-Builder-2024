@@ -201,9 +201,8 @@ jobs:
     - name: Install Python 2
       if: github.event.inputs.MANIFEST_BRANCH != 'twrp-11' && github.event.inputs.MANIFEST_BRANCH != 'twrp-12.1'  && github.event.inputs.MANIFEST_BRANCH != 'twrp-14'
       run: |
-        sudo apt-get -y remove python
+        # sudo apt-get -y remove python
         sudo apt-get -y install python2
-        sudo update-alternatives --config python
         cd /usr/bin
         sudo ln -sf python2 python
       continue-on-error: true
