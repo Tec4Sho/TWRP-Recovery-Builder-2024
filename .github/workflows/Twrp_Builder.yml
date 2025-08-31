@@ -325,9 +325,9 @@ jobs:
       run: |
         cd workspace
         sudo apt-get -y install python3
-        mv -n ${GITHUB_WORKSPACE}/workspace/${{ github.event.inputs.DEVICE_PATH }}/prebuilt/libneeds.txt ${GITHUB_WORKSPACE}/workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/libneeds
-        mv -n ${GITHUB_WORKSPACE}/workspace/${{ github.event.inputs.DEVICE_PATH }}/prebuilt/ldcheck.txt ${GITHUB_WORKSPACE}/workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/idcheck
-        cd ../workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root
+        mv -n ${{ github.event.inputs.DEVICE_PATH }}/prebuilt/libneeds out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/
+        mv -n ${{ github.event.inputs.DEVICE_PATH }}/prebuilt/ldcheck out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/
+        cd out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root
         python3 ldcheck -p system/lib64:vendor/lib64:system/lib:vendor/lib -d ${{ github.event.inputs.LDCHECK }}
         echo "Done checking missing dependencies. Review, and reconfigure your tree."
       continue-on-error: true
