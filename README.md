@@ -6,6 +6,9 @@ only Supports TWRP  (14.1 is not ready yet) / 12.1 / 11 / 9.0
 ![twrp_jpg](https://s3.bmp.ovh/imgs/2024/10/07/7e8dccdad37f834d.jpg)
 ## Release Notes
 ```
+= 2025-09-01
+- fix issues with twrp / android 9.0 building on github actions in 2025.
+
 = 2025-07-19
 - fix problem with device tree link in release!
 
