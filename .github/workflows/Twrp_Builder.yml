@@ -230,6 +230,10 @@ jobs:
         if [ !-d ${GITHUB_WORKSPACE}/workspace/out ]; then
             mkdir -p ${GITHUB_WORKSPACE}/workspace/out
             echo '# ninja_log' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log
+        elif [ -f ${GITHUB_WORKSPACE}/workspace/out/.ninja_log ]; then
+            echo '### ninja_log found ###' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log
+        else
+            echo '# ninja_log' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log > /dev/null 2>&1
         fi
       continue-on-error: true
 
@@ -328,6 +332,6 @@ jobs:
         mv -n ${{ github.event.inputs.DEVICE_PATH }}/prebuilt/libneeds out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/
         mv -n ${{ github.event.inputs.DEVICE_PATH }}/prebuilt/ldcheck out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/
         cd out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root
-        python3 ldcheck -p system/lib64:vendor/lib64:system/lib:vendor/lib -d ${{ github.event.inputs.LDCHECK }}
+        python3 ldcheck -p system/lib64:vendor/lib64:system/lib:vendor/lib -d system/bin/qseecomd
         echo "Done checking missing dependencies. Review, and reconfigure your tree."
       continue-on-error: true
