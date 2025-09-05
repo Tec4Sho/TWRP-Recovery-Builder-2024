@@ -227,13 +227,13 @@ jobs:
         echo '### large files in workspace dir ###'
         sudo find . -type f -size +100M -exec du -ha {} +
         # Make missing ninja_log
-        if [ !-d ${GITHUB_WORKSPACE}/workspace/out ]; then
-            mkdir -p ${GITHUB_WORKSPACE}/workspace/out
-            echo '# ninja_log' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log
-        elif [ -f ${GITHUB_WORKSPACE}/workspace/out/.ninja_log ]; then
-            echo '### ninja_log found ###' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log
+        if [ !-d out/ ]; then
+            mkdir -p out
+            echo '# ninja_log' > out/.ninja_log
+        elif [ !-f out/.ninja_log ]; then
+            echo '### ninja_log ###' > out/.ninja_log
         else
-            echo '# ninja_log' > ${GITHUB_WORKSPACE}/workspace/out/.ninja_log > /dev/null 2>&1
+            echo '# ninja_log file found continuing build'
         fi
       continue-on-error: true
 
