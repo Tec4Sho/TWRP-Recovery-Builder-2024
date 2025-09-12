@@ -43,18 +43,13 @@ on:
         - boot
         - recovery
         - vendorboot
-      RECOVERY_TAR:
-        description: 'Release Recovery.tar For Samsung devices'
-        type: boolean
-        required: false
-        default: 'false'
       RECOVERY_INSTALLER:
         description: 'Include recovery installer.zip'
         type: boolean
         required: false
         default: 'true'
       MAXIMIZE_BUILD_SPACE:
-        description: 'Cleans and remap storage paths'
+        description: 'MAXIMIZE BUILD SPACE'
         type: boolean
         required: false
         default: 'true'
@@ -111,7 +106,6 @@ jobs:
 
           # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup build space
-      if: github.event.inputs.MAXIMIZE_BUILD_SPACE == 'true'
       uses: rokibhasansagar/slimhub_actions@main
       # That's it! Now use your normal steps  
 
